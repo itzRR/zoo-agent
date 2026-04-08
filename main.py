@@ -10,7 +10,7 @@ model = GenerativeModel("gemini-1.5-flash")
 
 # Tool: Gemini API response using the Free API Key directly (bypass Vertex completely)
 def gemini_tool(prompt: str) -> str:
-    api_key = "AIzaSyCg5qa1OOaVGrffdvIf9kfLMc4ysFwavNs"
+    api_key = "gemini_api_key"
     # ONLY gemini-2.5-flash has a >0 quota limit on your free key!
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     try:
