@@ -1,54 +1,83 @@
-from google.adk.agents import Agent, SequentialAgent
-from vertexai.generative_models import GenerativeModel
-import vertexai
+import os
 import requests
 
-# Init Vertex AI (Kept for the auto-grader)
-vertexai.init(project="YOUR_PROJECT_ID", location="us-central1")
+print("🚀 Zoo Agent starting...")
 
-model = GenerativeModel("gemini-1.5-flash")
-
-# Tool: Gemini API response using the Free API Key directly (bypass Vertex completely)
+# 🔹 Gemini API Tool
 def gemini_tool(prompt: str) -> str:
-    api_key = "gemini_api_key"
-    # ONLY gemini-2.5-flash has a >0 quota limit on your free key!
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        return "Error: API key not found."
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+
     try:
-        resp = requests.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
-        if resp.status_code == 200:
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        response = requests.post(
+            url,
+            json={
+                "contents": [
+                    {"parts": [{"text": prompt}]}
+                ]
+            },
+            timeout=20
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"]
         else:
-            return f"API Error {resp.status_code}: {resp.text}"
+            return f"API Error {response.status_code}: {response.text}"
+
     except Exception as e:
         return f"Request Error: {str(e)}"
 
-# Researcher Agent
-researcher = Agent(
-    name="researcher",
-    instruction="Use Gemini to understand and answer the query.",
-    tools=[gemini_tool],
-)
 
-# Formatter Agent
-formatter = Agent(
-    name="formatter",
-    instruction="Format the response clearly and nicely.",
-)
-
-# Workflow
+# 🔹 Try to load ADK (safe)
 try:
-    zoo_agent = SequentialAgent(
-        name="zoo_agent",
-        agents=[researcher, formatter],
-    )
-except Exception:
-    zoo_agent = SequentialAgent(
-        name="zoo_agent",
-        sub_agents=[researcher, formatter],
+    from google.adk.agents import Agent, SequentialAgent
+
+    researcher = Agent(
+        name="researcher",
+        instruction="Understand the query and answer clearly using Gemini.",
+        tools=[gemini_tool],
     )
 
+    formatter = Agent(
+        name="formatter",
+        instruction="Format the response clearly using bullet points or short paragraphs.",
+    )
+
+    # Handle ADK version differences
+    try:
+        zoo_agent = SequentialAgent(
+            name="zoo_agent",
+            agents=[researcher, formatter],
+        )
+    except Exception:
+        zoo_agent = SequentialAgent(
+            name="zoo_agent",
+            sub_agents=[researcher, formatter],
+        )
+
+    print("✅ ADK loaded successfully")
+
+except Exception as e:
+    print("⚠️ ADK failed, using fallback:", e)
+    zoo_agent = None
+
+
+# 🔹 Run function (FINAL SAFE VERSION)
 def run_agent(prompt: str):
-    if hasattr(zoo_agent, "run"):
-        return zoo_agent.run(prompt)
-    else:
+    try:
+        if zoo_agent:
+            if hasattr(zoo_agent, "run"):
+                return zoo_agent.run(prompt)
+            elif hasattr(zoo_agent, "invoke"):
+                return zoo_agent.invoke(prompt)
+        
+        # fallback (always works)
         return gemini_tool(prompt)
+
+    except Exception as e:
+        return f"Agent Error: {str(e)}"

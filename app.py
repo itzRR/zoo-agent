@@ -250,7 +250,7 @@ UI_HTML = """<!DOCTYPE html>
 <header>
   <div class="emoji-row">🦁 🐘 🦒 🐧 🐬</div>
   <h1>Zoo AI Assistant</h1>
-  <p>Powered by Google ADK &amp; Gemini — Ask me anything about animals!</p>
+  <p>Powered by Google ADK &amp; Gemini - Ask me anything about animals!</p>
 </header>
 
 <main>

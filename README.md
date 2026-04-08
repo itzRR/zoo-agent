@@ -1,124 +1,120 @@
-# 🦁 Zoo AI Assistant
+Zoo AI Assistant
 
-A Google ADK-powered Zoo AI Assistant using **SequentialAgent** and the **Wikipedia tool**, deployed on **Google Cloud Run**.
+An intelligent multi-agent AI system powered by Gemini API, built using Google ADK, and deployed on Cloud Run.
 
----
+--------------------------------------------------
 
-## 🏗️ Architecture
+OVERVIEW
 
-```
-User Query
-    │
-    ▼
-┌─────────────────────────────────┐
-│         SequentialAgent         │
-│  zoo_agent                      │
-│                                 │
-│  1. researcher  ──► wiki_tool   │
-│         │                       │
-│  2. formatter   ──► response    │
-└─────────────────────────────────┘
-```
+Zoo AI Assistant is a cloud-based application that allows users to ask questions about animals and receive structured, AI-generated responses.
 
-- **Researcher Agent** — searches Wikipedia for factual info
-- **Formatter Agent** — presents facts in a friendly, emoji-rich style
-- **FastAPI** — REST API + built-in UI served at `/`
+The system uses a SequentialAgent workflow:
+- Researcher Agent → Generates answers using Gemini API
+- Formatter Agent → Structures the response clearly
 
----
+--------------------------------------------------
 
-## 🚀 Quick Start (Local)
+FEATURES
 
-```bash
-# Install dependencies
+- Multi-agent architecture (SequentialAgent)
+- Gemini-powered natural language responses
+- Clean and interactive web UI
+- Real-time query processing
+- Cloud Run deployment (scalable & serverless)
+- Secure API key handling via environment variables
+
+--------------------------------------------------
+
+TECH STACK
+
+- Python
+- FastAPI
+- Google ADK (Agent Development Kit)
+- Gemini API (Google AI)
+- Docker
+- Google Cloud Run
+
+--------------------------------------------------
+
+DEMO
+
+Ask questions like:
+Tell me about lions
+
+The AI generates structured and informative responses with a clean UI.
+
+--------------------------------------------------
+
+SETUP (LOCAL)
+
+1. Clone the repository
+git clone https://github.com/your-username/zoo-agent.git
+cd zoo-agent
+
+2. Install dependencies
 pip install -r requirements.txt
 
-# Run locally
-python app.py
-# OR
-uvicorn app:app --reload --port 8080
-```
+3. Set environment variable
 
-Open http://localhost:8080
+Linux/Mac:
+export GEMINI_API_KEY=your_api_key
 
----
+Windows (PowerShell):
+setx GEMINI_API_KEY "your_api_key"
 
-## ☁️ Deploy to Google Cloud Run
+4. Run locally
+uvicorn app:app --reload
 
-### 1. Authenticate & Set Project
+Open:
+http://localhost:8000
 
-```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-```
+--------------------------------------------------
 
-### 2. Enable Required APIs
+DEPLOY TO CLOUD RUN
 
-```bash
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com
-```
+gcloud run deploy zoo-agent --source . --region asia-southeast1 --allow-unauthenticated --set-env-vars GEMINI_API_KEY=your_api_key
 
-### 3. Deploy
+--------------------------------------------------
 
-```bash
-gcloud run deploy zoo-agent \
-  --source . \
-  --region asia-southeast1 \
-  --allow-unauthenticated \
-  --port 8080
-```
+SECURITY NOTE
 
-### 4. Test
+- Never expose your API key in code or GitHub
+- Always use environment variables
+- Regenerate keys if leaked
 
-```
-# Health check
-https://your-url.run.app/health
+--------------------------------------------------
 
-# Ask a question
-https://your-url.run.app/ask?q=lion
+API ENDPOINTS
 
-# Open the UI
-https://your-url.run.app/
-```
+/           → Web UI
+/ask?q=lion → Get AI response
+/health     → Health check
 
----
+--------------------------------------------------
 
-## 🌐 API Endpoints
+USE CASE
 
-| Method | Endpoint   | Description                        |
-|--------|------------|------------------------------------|
-| GET    | `/`        | Zoo AI Assistant UI (HTML)         |
-| GET    | `/health`  | Health check for Cloud Run         |
-| GET    | `/ask?q=`  | Ask a question (JSON response)     |
-| GET    | `/docs`    | Auto-generated Swagger/OpenAPI UI  |
+- Educational AI assistant
+- Animal knowledge system
+- Multi-agent AI demonstration
 
-### Example Response
+--------------------------------------------------
 
-```json
-{
-  "query": "lion",
-  "response": "🦁 Lions are the second-largest big cats in the world! They live in sub-Saharan Africa and parts of India in grasslands and savannahs..."
-}
-```
+AUTHOR
 
----
+Rehan Bandara
+Web Designer & Software Engineer
 
-## 📦 Project Structure
+--------------------------------------------------
 
-```
-zoo-agent/
-├── main.py           # Agent logic (SequentialAgent + wiki_tool)
-├── app.py            # FastAPI app with built-in UI
-├── requirements.txt  # Python dependencies
-├── Dockerfile        # Cloud Run container
-├── .dockerignore
-└── README.md
-```
+ACKNOWLEDGEMENTS
 
----
+- Google Cloud
+- Gemini API
+- Google ADK
 
-## 🔑 Environment Variables
+--------------------------------------------------
 
-| Variable           | Description                        | Default |
-|--------------------|------------------------------------|---------|
-| `PORT`             | Port to listen on                  | `8080`  |
-| `GOOGLE_CLOUD_PROJECT` | GCP project for Vertex AI      | —       |
+LICENSE
+
+This project is for educational purposes.

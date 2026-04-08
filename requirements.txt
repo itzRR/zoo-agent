@@ -1,6 +1,4 @@
-google-cloud-aiplatform
-google-adk
-wikipedia
 fastapi
 uvicorn[standard]
 requests
+google-adk
