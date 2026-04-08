@@ -103,7 +103,6 @@ USE CASE
 AUTHOR
 
 Rehan Bandara
-Web Designer & Software Engineer
 
 --------------------------------------------------
 
